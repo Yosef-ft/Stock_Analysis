@@ -70,17 +70,19 @@ jobs:
 
       - name: Commit changes if any files were reformatted
         run: |
-          git config --global user.email "yosefetene02@gmail.com"
-          git config --global user.name "Yosef-ft"
+
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
-          git diff-index --quiet HEAD || git commit -m "Auto-fix code with autoflake, black and isort"
+          git commit -m "Auto-fix code with autoflake, black and isort"    
 
       - name: Push changes
-        run: |
-          git remote set-url origin https://Yosef-ft:${{ secrets.PAT_TOKEN2 }}@github.com/Yosef-ft/Stock_Analysis.git
-          git push origin HEAD:${{ github.ref }}
         env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN2 }} 
+          PAT: ${{ secrets.PAT_TOKEN3 }}
+        run: |
+          git push https://x-access-token:${{ secrets.PAT_TOKEN3 }}@github.com/Yosef-ft/Stock_Analysis.git HEAD:${{ github.ref_name }}          
+          
+
 
       - name: Run Super-Linter
         uses: github/super-linter@v4
