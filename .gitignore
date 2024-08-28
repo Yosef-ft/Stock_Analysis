@@ -1,3 +1,9 @@
 data
 
-Week1_env
+.venv
+
+ta-lib
+
+.python-version
+
+__pycache__
