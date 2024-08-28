@@ -56,13 +56,25 @@ jobs:
           pip install flake8
 
       - name: Run isort
-        run: isort . --check-only
+        run: isort .
 
       - name: Run black
-        run: black --check .
+        run: black .
 
       - name: Run flake8
         run: flake8 .
+
+      - name: Commit changes if any files were reformatted
+        run: |
+          git config --global user.email "yosefetene02@gmail.com"
+          git config --global user.name "Yosef-ft"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Auto-format code with black and isort"
+
+      - name: Push changes
+        run: git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
 
       - name: Run Super-Linter
         uses: github/super-linter@v4
