@@ -50,6 +50,7 @@ jobs:
 
       - name: Install linters (black, isort, flake8)
         run: |
+          pip install "black[jupyter]"
           pip install black
           pip install isort
           pip install flake8
