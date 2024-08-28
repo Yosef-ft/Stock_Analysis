@@ -14,6 +14,8 @@ on:
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: write
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -78,9 +80,9 @@ jobs:
 
       - name: Push changes
         env:
-          PAT: ${{ secrets.PAT_TOKEN3 }}
+          PAT: ${{ secrets.PAT_TOKEN2 }}
         run: |
-          git push https://x-access-token:${{ secrets.PAT_TOKEN3 }}@github.com/Yosef-ft/Stock_Analysis.git HEAD:${{ github.ref_name }}          
+          git push https://x-access-token:${{ secrets.PAT_TOKEN2 }}@github.com/Yosef-ft/Stock_Analysis.git HEAD:${{ github.ref_name }}          
           
 
 
