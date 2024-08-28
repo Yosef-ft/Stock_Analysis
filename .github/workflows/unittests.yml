@@ -43,6 +43,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install black
+        run: pip install black
+
+      - name: Run black
+        run: black --check .
+
       - name: Run Super-Linter
         uses: github/super-linter@v4
         env:
