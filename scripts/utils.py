@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 
@@ -24,4 +23,3 @@ class DataUtils:
         )
 
         return hist_data
-
