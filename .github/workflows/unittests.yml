@@ -48,11 +48,20 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install black
-        run: pip install black
+      - name: Install linters (black, isort, flake8)
+        run: |
+          pip install black
+          pip install isort
+          pip install flake8
+
+      - name: Run isort
+        run: isort . --check-only
 
       - name: Run black
         run: black --check .
+
+      - name: Run flake8
+        run: flake8 .
 
       - name: Run Super-Linter
         uses: github/super-linter@v4
