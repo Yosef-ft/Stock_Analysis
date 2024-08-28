@@ -77,10 +77,10 @@ jobs:
 
       - name: Push changes
         run: |
-          git remote set-url origin https://Yosef-ft:${{ secrets.PAT_TOKEN }}@github.com/Yosef-ft/Stock_Analysis.git
+          git remote set-url origin https://Yosef-ft:${{ secrets.PAT_TOKEN2 }}@github.com/Yosef-ft/Stock_Analysis.git
           git push origin HEAD:${{ github.ref }}
         env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }} 
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN2 }} 
 
       - name: Run Super-Linter
         uses: github/super-linter@v4
