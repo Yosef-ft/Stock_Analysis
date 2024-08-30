@@ -7,3 +7,5 @@ ta-lib
 .python-version
 
 __pycache__
+
+*csv
