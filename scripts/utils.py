@@ -1,13 +1,15 @@
-from datetime import datetime
-import numpy as np
 import pandas as pd
 
 
 class DataUtils:
     def load_news_data(self):
-        news = pd.read_csv("../data/raw_analyst_ratings.csv/raw_analyst_ratings.csv", parse_dates=['date'], index_col=['date'])
-        news.drop('Unnamed: 0', axis=1, inplace=True)
-        news.index = pd.to_datetime(news.index, utc=True, format='ISO8601')
+        news = pd.read_csv(
+            "../data/raw_analyst_ratings.csv/raw_analyst_ratings.csv",
+            parse_dates=["date"],
+            index_col=["date"],
+        )
+        news.drop("Unnamed: 0", axis=1, inplace=True)
+        news.index = pd.to_datetime(news.index, utc=True, format="ISO8601")
 
         return news
 
