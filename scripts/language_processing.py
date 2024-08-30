@@ -56,9 +56,9 @@ class LanguageProcessing:
     
     def categorize_headline(self, sentiment_score):
 
-        if sentiment_score >= 0.95:
+        if sentiment_score >= 0.90:
             return "Extremely Positive"
-        elif sentiment_score <= -0.95:
+        elif sentiment_score <= -0.90:
             return "Extremely Negative"
         elif sentiment_score > 0.5:
             return "Positive"
