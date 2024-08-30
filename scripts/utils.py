@@ -27,4 +27,3 @@ class DataUtils:
         )
 
         return hist_data
-
