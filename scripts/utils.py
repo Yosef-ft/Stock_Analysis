@@ -25,8 +25,12 @@ class DataUtils:
         }
 
         hist_data = pd.read_csv(
-            f"../data/yfinance_data/yfinance_data/{ticker_data[ticker]}.csv"
-        )
+            f"../data/yfinance_data/yfinance_data/{ticker_data[ticker]}.csv",
+    
+        ).set_index('Date')
+        hist_data.index = pd.to_datetime(hist_data.index)
+
+        hist_data.drop(['Dividends', 'Stock Splits'], axis=1, inplace=True)
 
         return hist_data
     
