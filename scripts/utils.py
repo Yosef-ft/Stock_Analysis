@@ -29,3 +29,6 @@ class DataUtils:
         )
 
         return hist_data
+    
+    def extract_domain(self, email):
+        return email.split('@')[1]
