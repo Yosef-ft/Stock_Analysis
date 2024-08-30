@@ -74,7 +74,6 @@ class LanguageProcessing:
                              stop_words='english')
         
         train_dtm = vectorizer.fit_transform(data.headline)
-        words = vectorizer.get_feature_names_out()
 
         train_token_count = train_dtm.sum(0).A.squeeze()
         tokens = vectorizer.get_feature_names_out()
