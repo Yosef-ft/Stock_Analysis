@@ -14,7 +14,6 @@ import regex as re
 
 
 class LanguageProcessing:
-
     def __init__(self):
         self.download_nltk_corpus()
         self.stop_words = set(stopwords.words("english"))
