@@ -30,7 +30,7 @@ class TechnicalIndicator:
         '''
         self.data['HT_TRENDLINE'] = ta.HT_TRENDLINE(self.data['Close'])
         self.data['TYPPRICE'] = ta.TYPPRICE(self.data['High'], self.data['Low'], self.data['Close'])
-        self.data[''] = ta.HT_TRENDMODE(self.data['Close'])
+        self.data['HT_TRENDMODE'] = ta.HT_TRENDMODE(self.data['Close'])
 
     def volume_indicators(self):
         '''
@@ -48,6 +48,156 @@ class TechnicalIndicator:
         upperband, middleband, lowerband = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
         self.data['ATR'] = ta.ATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['ATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
+
+
+    def plot_price_indicators(self, data: pd.DataFrame):
+        '''
+        Plots indicators that are close to the price
+        '''
+
+        fig, ax1 = plt.subplots(figsize=(14, 7))
+
+        # Plot the Close price
+        ax1.plot(data.index, data['Close'], label='Close Price', color='blue')
+
+        # Plot the indicators
+        ax1.plot(data.index, data['EMA'], label='EMA', color='red')
+        ax1.plot(data.index, data['WMA'], label='WMA', color='green')
+        ax1.plot(data.index, data['ADXR'], label='ADXR', color='orange')
+        ax1.plot(data.index, data['HT_TRENDLINE'], label='HT_TRENDLINE', color='brown')
+        ax1.plot(data.index, data['TYPPRICE'], label='TYPPRICE', color='pink')
+        ax1.plot(data.index, data['TSF'], label='TSF', color='cyan')
+
+        ax1.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        ax1.set_title('Close Price with Indicators')
+        ax1.set_xlabel('Date')
+        ax1.set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+    
+    def plot_RSI(self, data):
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['RSI'], label='RSI', color='purple')
+        axes[1].axhline(y=20, color='red', linestyle='--', label='Oversold (20)')
+        axes[1].axhline(y=80, color='green', linestyle='--', label='Overbought (80)')
+        
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('RSI Indicators with 20 and 80 as oversold and overbought lines')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_CMO(self, data):
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+
+        axes[1].plot(data.index, data['CMO'], label='CMO', color='gray')
+        axes[1].axhline(y=-50, color='red', linestyle='--', label='Oversold (-50)')
+        axes[1].axhline(y=50, color='green', linestyle='--', label='Overbought (50)')
+
+        axes[0].set_title("Closing price")
+        
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('CMO Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_MFI(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['MFI'], label='MFI', color='magenta')
+        axes[1].axhline(y=20, color='red', linestyle='--', label='Oversold (20)')
+        axes[1].axhline(y=80, color='green', linestyle='--', label='Overbought (80)')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('MFI Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_OBV(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['OBV'], label='OBV', color='yellow')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('OBV Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+
+    def plot_AD(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['AD'], label='AD', color='darkblue')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('AD Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()     
+
+
+    def plot_ATR(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['ATR'], label='ATR', color='darkgreen')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('ATR Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()                  
 
 
 
