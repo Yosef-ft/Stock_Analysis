@@ -47,7 +47,7 @@ class TechnicalIndicator:
         # Bollinger band
         upperband, middleband, lowerband = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
         self.data['ATR'] = ta.ATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
-        self.data['ATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
+        self.data['NATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
 
 
     def plot_price_indicators(self, data: pd.DataFrame):

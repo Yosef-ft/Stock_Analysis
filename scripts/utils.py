@@ -2,7 +2,8 @@ import pandas as pd
 
 
 class DataUtils:
-    def load_news_data(self):
+    def load_news_data(self, ticker = None):  
+
         news = pd.read_csv(
             "../data/raw_analyst_ratings.csv/raw_analyst_ratings.csv",
             parse_dates=["date"],
@@ -11,7 +12,12 @@ class DataUtils:
         news.drop("Unnamed: 0", axis=1, inplace=True)
         news.index = pd.to_datetime(news.index, utc=True, format="ISO8601")
 
-        return news
+        if ticker:
+            news = news.loc[news['stock'] == ticker]
+            return news
+        else:
+            return news
+        
 
     def load_historical_data(self, ticker: str):
         ticker_data = {
