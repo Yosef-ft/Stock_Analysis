@@ -15,7 +15,7 @@ class TechnicalIndicator:
         self.data['WMA'] = ta.WMA(self.data['Close'], timeperiod=30)
         self.data['ADXR'] = ta.ADXR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['RSI'] = ta.RSI(self.data['Close'], timeperiod=14)
-        macd, macdsignal, macdhist = ta.MACD(self.data['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
+        self.data['macd'], self.data['macdsignal'], self.data['macdhist'] = ta.MACD(self.data['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
 
     def leading_indicators(self):
         '''
@@ -45,7 +45,7 @@ class TechnicalIndicator:
         Volatility indicators measure the degree of variation in a financial instrument's price over time.
         '''
         # Bollinger band
-        upperband, middleband, lowerband = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
+        self.data['BB_upperband'], self.data['middleband'], self.data['lowerband'] = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
         self.data['ATR'] = ta.ATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['NATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
 
