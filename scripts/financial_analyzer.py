@@ -2,6 +2,13 @@ import talib as ta
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from utils import DataUtils 
+
+from pypfopt.efficient_frontier import EfficientFrontier
+from pypfopt.expected_returns import mean_historical_return
+from pypfopt.risk_models import CovarianceShrinkage
+from pypfopt import plotting
+import cvxpy
 
 class TechnicalIndicator:
     def __init__(self, data):
@@ -15,7 +22,7 @@ class TechnicalIndicator:
         self.data['WMA'] = ta.WMA(self.data['Close'], timeperiod=30)
         self.data['ADXR'] = ta.ADXR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['RSI'] = ta.RSI(self.data['Close'], timeperiod=14)
-        macd, macdsignal, macdhist = ta.MACD(self.data['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
+        self.data['macd'], self.data['macdsignal'], self.data['macdhist'] = ta.MACD(self.data['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
 
     def leading_indicators(self):
         '''
@@ -45,7 +52,7 @@ class TechnicalIndicator:
         Volatility indicators measure the degree of variation in a financial instrument's price over time.
         '''
         # Bollinger band
-        upperband, middleband, lowerband = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
+        self.data['BB_upperband'], self.data['BB_middleband'], self.data['BB_lowerband'] = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
         self.data['ATR'] = ta.ATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['NATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
 
@@ -63,7 +70,6 @@ class TechnicalIndicator:
         # Plot the indicators
         ax1.plot(data.index, data['EMA'], label='EMA', color='red')
         ax1.plot(data.index, data['WMA'], label='WMA', color='green')
-        ax1.plot(data.index, data['ADXR'], label='ADXR', color='orange')
         ax1.plot(data.index, data['HT_TRENDLINE'], label='HT_TRENDLINE', color='brown')
         ax1.plot(data.index, data['TYPPRICE'], label='TYPPRICE', color='pink')
         ax1.plot(data.index, data['TSF'], label='TSF', color='cyan')
@@ -199,8 +205,192 @@ class TechnicalIndicator:
         plt.tight_layout()
         plt.show()                  
 
+    def plot_ADXR(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['ADXR'], label='ADXR', color='yellow')
+        axes[1].axhline(y=20, color='red', linestyle='--', label='< 20 weak trend')
+        axes[1].axhline(y=25, color='green', linestyle='--', label='> 25 stronger trend')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('ADXR Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()        
+
 
 
         
+class PortOptimizer:
+    def __init__(self):
+        data_utils = DataUtils()
+        self.AAPL = data_utils.load_historical_data("AAPL")
+        self.AMZN = data_utils.load_historical_data("AMZN")
+        self.GOOG = data_utils.load_historical_data("GOOG")
+        self.META = data_utils.load_historical_data("META")
+        self.MSFT = data_utils.load_historical_data("MSFT")
+        self.NVDA = data_utils.load_historical_data("NVDA")
+        self.TSLA = data_utils.load_historical_data("TSLA")
+
+        self.AAPL_price = self.AAPL['Adj Close']
+        self.AMZN_price = self.AMZN['Adj Close']
+        self.GOOG_price = self.GOOG['Adj Close']
+        self.META_price = self.META['Adj Close']
+        self.MSFT_price = self.MSFT['Adj Close']
+        self.NVDA_price = self.NVDA['Adj Close']
+        self.TSLA_price = self.TSLA['Adj Close']
 
 
+    def load_adjusted_adj_close_all_ticker(self):
+        ticker_prices = pd.concat([self.AAPL['Adj Close'],
+                            self.AMZN['Adj Close'],
+                            self.GOOG['Adj Close'],
+                            self.META['Adj Close'],
+                            self.MSFT['Adj Close'],
+                            self.NVDA['Adj Close'],
+                            self.TSLA['Adj Close']], axis=1, join='inner')
+
+        ticker_prices.columns = ['AAPL', 'AMZN', 'GOOG', 'META', 'MSFT', 'NVDA', 'TSLA']
+
+        return ticker_prices
+    
+
+    def calculate_eReturn_covariance(self, adj_close: pd.DataFrame):
+        '''
+        This function calculates the covariance matrix and expected return for a given adjusted price.
+
+        Parameters:
+            adj_close (pandas.Datafrme): dataframe containing adjusted close for all tickers
+        
+        Returns:
+            covariance_matrix(pandas.DatFrame), Expected_return(pandas.Series)
+        '''
+
+        expected_return = mean_historical_return(adj_close)
+        covariance_matrix = CovarianceShrinkage(adj_close).ledoit_wolf()
+
+        return covariance_matrix, expected_return
+    
+
+    def calculate_EfficientFrontier(self, adj_close: pd.DataFrame):
+        '''
+        This fuction calculates the efficient frontier and also the weights
+
+        Parameters:
+            adj_close (pandas.Datafrme): dataframe containing adjusted close for all tickers
+
+        Returns:
+            efficient_frontier (pypfopt.efficient_frontier.efficient_frontier.EfficientFrontier)
+        '''
+
+        covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+        ef = EfficientFrontier(expected_return, covariance_matrix)
+
+        return ef
+
+        
+    def clean_weights(self, adj_close: pd.DataFrame):
+        '''
+        This function calculates the weights and returns the clean weight for your portfolio
+
+        Parameters:
+            adj_close (pandas.Datafrme): dataframe containing adjusted close for all tickers
+        
+        Returns:
+            clean_weight(OrderedDict)
+        '''
+
+        covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+        ef = EfficientFrontier(expected_return, covariance_matrix)
+
+        weights = ef.max_sharpe()
+        clean_weight = ef.clean_weights()
+
+        return clean_weight
+    
+
+    def plot_weights(self, adj_close: pd.DataFrame, allow_shorts=False):
+        '''
+        This function takes Efficient Frontier and plots the weights
+
+        Parameters:
+            adj_close (pandas.Datafrme): dataframe containing adjusted close for all tickers
+            allow_shorts(bool): this will plot if we allow short selling
+
+        Returns:
+            matplotlib plot
+        '''
+
+        if allow_shorts:
+            covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+            ef = EfficientFrontier(expected_return, covariance_matrix, weight_bounds=(-1,1)) 
+            
+        else:
+            covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+            ef = EfficientFrontier(expected_return, covariance_matrix)   
+             
+
+        plotting.plot_weights(ef.max_sharpe())
+
+
+    def plot_efficient_frontier(self, adj_close: pd.DataFrame, allow_shorts=False):
+        '''
+        This function takes Efficient Frontier and plots the Efficient frontier
+
+        Parameters:
+            adj_close (pandas.Datafrme): dataframe containing adjusted close for all tickers
+            allow_shorts(bool): this will plot if we allow short selling
+
+        Returns:
+            matplotlib plot
+        ''' 
+
+        if allow_shorts:
+            covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+            ef = EfficientFrontier(expected_return, covariance_matrix)   
+            ef_plot = EfficientFrontier(expected_return, covariance_matrix, weight_bounds=(-1,1))
+
+            weights_plot = ef_plot.max_sharpe()
+
+            ef_plot.portfolio_performance(verbose=True)
+
+            ef_constraints = EfficientFrontier(expected_return, covariance_matrix, weight_bounds=(-1,1))
+
+            ef_constraints.add_constraint(lambda x: cvxpy.sum(x) == 1)
+
+            fig, ax = plt.subplots()
+            ax.scatter(ef_plot.portfolio_performance()[1], ef_plot.portfolio_performance()[0], marker='*', color='r', s=200,
+                    label='Tangency portfolio')
+
+            ax.legend()
+            plotting.plot_efficient_frontier(ef, ax=ax, show_assets=True)
+            plt.show()
+
+        else:
+            covariance_matrix, expected_return = self.calculate_eReturn_covariance(adj_close)
+            ef = EfficientFrontier(expected_return, covariance_matrix)   
+            ef_plot = EfficientFrontier(expected_return, covariance_matrix, weight_bounds=(0,1))
+
+            weights_plot = ef_plot.max_sharpe()
+
+            ef_plot.portfolio_performance(verbose=True)
+
+            ef_constraints = EfficientFrontier(expected_return, covariance_matrix, weight_bounds=(0,1))
+
+            ef_constraints.add_constraint(lambda x: cvxpy.sum(x) == 1)
+
+            fig, ax = plt.subplots()
+            ax.scatter(ef_plot.portfolio_performance()[1], ef_plot.portfolio_performance()[0], marker='*', color='r', s=200,
+                    label='Tangency portfolio')
+
+            ax.legend()
+            plotting.plot_efficient_frontier(ef, ax=ax, show_assets=True)
+            plt.show()
