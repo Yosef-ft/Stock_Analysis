@@ -45,7 +45,7 @@ class TechnicalIndicator:
         Volatility indicators measure the degree of variation in a financial instrument's price over time.
         '''
         # Bollinger band
-        self.data['BB_upperband'], self.data['middleband'], self.data['lowerband'] = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
+        self.data['BB_upperband'], self.data['BB_middleband'], self.data['BB_lowerband'] = ta.BBANDS(self.data['Close'], timeperiod=5, nbdevup=2, nbdevdn=2, matype=0)
         self.data['ATR'] = ta.ATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
         self.data['NATR'] = ta.NATR(self.data['High'], self.data['Low'], self.data['Close'], timeperiod=14)
 
@@ -63,7 +63,6 @@ class TechnicalIndicator:
         # Plot the indicators
         ax1.plot(data.index, data['EMA'], label='EMA', color='red')
         ax1.plot(data.index, data['WMA'], label='WMA', color='green')
-        ax1.plot(data.index, data['ADXR'], label='ADXR', color='orange')
         ax1.plot(data.index, data['HT_TRENDLINE'], label='HT_TRENDLINE', color='brown')
         ax1.plot(data.index, data['TYPPRICE'], label='TYPPRICE', color='pink')
         ax1.plot(data.index, data['TSF'], label='TSF', color='cyan')
@@ -199,8 +198,31 @@ class TechnicalIndicator:
         plt.tight_layout()
         plt.show()                  
 
+    def plot_ADXR(self, data):
+
+        fig, axes = plt.subplots(nrows=2, figsize=(14, 7))
+
+        # Plot the Close price
+        axes[0].plot(data.index, data['Close'], label='Close Price', color='blue')
+        axes[0].set_title("Closing price")
+
+        axes[1].plot(data.index, data['ADXR'], label='ADXR', color='yellow')
+        axes[1].axhline(y=20, color='red', linestyle='--', label='< 20 weak trend')
+        axes[1].axhline(y=25, color='green', linestyle='--', label='> 25 stronger trend')
+
+        plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+        axes[1].set_title('ADXR Indicator')
+        axes[1].set_xlabel('Date')
+        axes[1].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()        
+
 
 
         
-
+class PortOptimizer:
+    def __init__(self):
+        pass
 
